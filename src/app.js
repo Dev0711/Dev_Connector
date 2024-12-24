@@ -2,32 +2,16 @@ const express = require("express");
 
 const app = express();
 
-app.get("/user/:userId/:name/:passwrod", (req, res) => {
-  console.log(req.params);
-  res.send({ firstname: "dev", lastname: "oza" });
-});
-// only handles get call /user
-// app.get("/user", (req, res) => {
-//   res.send({ firstname: "dev", lastname: "oza" });
-// });
+const { adminAuth, userAuth } = require("./Middlewares/auth");
 
-app.post("/user", (req, res) => {
-  res.send("Data saved succesfully");
-});
+app.use("/admin", adminAuth);
 
-app.delete("/user", (req, res) => {
-  res.send("data deleted!");
+app.get("/admin/getAlldata", (req, res) => {
+  res.send("admin data");
 });
-
-app.patch("/user", (req, res) => {
-  res.send("data updated");
+app.get("/user", userAuth, (req, res) => {
+  res.send("this is user auth");
 });
-// this will match all the http methods calls on /test if you use it in /user and write it above all then you can check
-//all the /user information will be shadowed by app.use("/user") it always prints this code rather then post, get, delete
-app.use("/test", (req, res) => {
-  res.send("Hello second path");
-});
-
 app.listen(7777, () => {
   console.log("server is successfully listerning");
 });

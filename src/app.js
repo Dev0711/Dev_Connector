@@ -4,8 +4,12 @@ const connetDB = require("./config/database");
 const app = express();
 
 const User = require("./models/user");
+app.use(express.json());
 
 app.post("/signup", async (req, res) => {
+  console.log(req.body);
+
+  const user = new User(req.body);
   // const userObj = {
   //   firstName:"dev",
   //   lastName: "oza",
@@ -15,11 +19,11 @@ app.post("/signup", async (req, res) => {
   // // creating new instance of user model
   // const user = new User(userObj);
 
-  const user = new User({
-    firstName: "vaibhavi",
-    lastName: "oza",
-    emailId: "def@1232",
-  });
+  // const user = new User({
+  //   firstName: "vaibhavi",
+  //   lastName: "oza",
+  //   emailId: "def@1232",
+  // });
 
   try {
     await user.save();

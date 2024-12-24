@@ -1,18 +1,41 @@
 const express = require("express");
+const connetDB = require("./config/database");
 
 const app = express();
 
-const { adminAuth, userAuth } = require("./Middlewares/auth");
+const User = require("./models/user");
 
-app.use("/admin", adminAuth);
+app.post("/signup", async (req, res) => {
+  // const userObj = {
+  //   firstName:"dev",
+  //   lastName: "oza",
+  //   password: "23423",
+  //   age: "34"
+  // }
+  // // creating new instance of user model
+  // const user = new User(userObj);
 
-app.get("/admin/getAlldata", (req, res) => {
-  res.send("admin data");
+  const user = new User({
+    firstName: "vaibhavi",
+    lastName: "oza",
+    emailId: "def@1232",
+  });
+
+  try {
+    await user.save();
+    res.send("Data added succesfully");
+  } catch (err) {
+    res.status(403).res.send("Error to add some data");
+  }
 });
-app.get("/user", userAuth, (req, res) => {
-  // we can write userAuth, pass like this aslo
-  res.send("this is user auth");
-});
-app.listen(7777, () => {
-  console.log("server is successfully listerning");
-});
+
+connetDB()
+  .then(() => {
+    console.log("databasse connetion establisted");
+    app.listen(7777, () => {
+      console.log("server is successfully listerning");
+    });
+  })
+  .catch((err) => {
+    console.log("database in not connceted");
+  });

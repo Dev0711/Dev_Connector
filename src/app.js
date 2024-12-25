@@ -9,25 +9,11 @@ app.use(express.json());
 
 app.post("/signup", async (req, res) => {
   const users = new User(req.body);
-  // const userObj = {
-  //   firstName:"dev",
-  //   lastName: "oza",
-  //   password: "23423",
-  //   age: "34"
-  // }
-  // // creating new instance of user model
-  // const user = new User(userObj);
-
-  // const user = new User({
-  //   firstName: "vaibhavi",
-  //   lastName: "oza",
-  //   emailId: "def@1232",
-  // });
-
   try {
     await users.save();
     res.send("Data added succesfully");
   } catch (err) {
+    console.log(err);
     res.status(403).send("Error to add some data");
   }
 });
@@ -56,13 +42,28 @@ app.delete("/user", async (req, res) => {
   }
 });
 
-app.patch("/user", async (req, res) => {
-  const userId = req.body.userId;
+app.patch("/user/:userId", async (req, res) => {
+  const userId = req.params?.userId;
+
   try {
+    const ALLOWED_UPDATE_FIELDS = ["userId", "photoUrl", "about", "gender", "age", "skills"];
+    const isApdateAllowed = Object.keys(req.body).every((update) => ALLOWED_UPDATE_FIELDS.includes(update));
+
+    if (!isApdateAllowed) {
+      throw new Error("not allowed to update");
+    }
+    if (data?.skills.length > 5) {
+      throw new Error("not allowed to update");
+    }
     const users = await User.findByIdAndUpdate(userId, req.body);
-    res.send("user updated");
+    if (!users) {
+      res.status(404).send("user not found");
+    } else {
+      console.log(users);
+      res.send("user updated");
+    }
   } catch (err) {
-    res.status(404).send("user not found");
+    res.status(500).send("internal server error");
   }
 });
 

@@ -41,3 +41,17 @@
 - Create POST/signup API to add data to database
 - Push some documents using API calls from postman
 - Error Handling using try , catch
+
+- Js objects vs JSSON
+- Add the express-json middleware to your app
+- Make your signup api dynamic to recive data from the user
+- User-findOne wih duplicate emai ids, which object returned
+- API- get user by email
+- API - Feed API - GET/feed - get all the users from the database
+- API - Get user by Id
+- Create a delete user API
+- Diff PATCH and PUT
+- API - update teh user
+- Explore the Mongoose Documentation for MOdel methos
+- What are options in Model.finOneAndUpdate mdethod, explore more ab out it
+- API - Update the user with email Id

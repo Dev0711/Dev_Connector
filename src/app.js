@@ -1,22 +1,56 @@
 const express = require("express");
 const connetDB = require("./config/database");
+const bcrypt = require("bcrypt");
 
 const app = express();
 
 const User = require("./models/user");
 
 app.use(express.json());
+const { validateSingupData } = require("./utils/validators");
 
 app.post("/signup", async (req, res) => {
-  const users = new User(req.body);
   try {
+    // validation of data
+    validateSingupData(req);
+
+    const { firstName, lastName, emailId, password } = req.body;
+    const passwordHash = await bcrypt.hash(password, 10);
+    console.log(passwordHash);
+
+    // const users = new User(req.body);
+    const users = new User({
+      firstName,
+      lastName,
+      emailId,
+      password: passwordHash,
+    });
+
     await users.save();
     res.send("Data added succesfully");
   } catch (err) {
     console.log(err);
-    res.status(403).send("Error to add some data");
+    res.status(403).send("ERROR:" + err.message);
   }
 });
+
+app.post("/login", async (req, res) => {
+  try {
+    const { emailId, password } = req.body;
+    const user = await User.findOne({ emailId });
+    if (!user) {
+      res.status(404).send("user not found");
+    }
+    const isPasswordMatch = await bcrypt.compare(password, user.password);
+    if (!isPasswordMatch) {
+      res.status(403).send("invalid password");
+    }
+    res.send("Loin succesfully");
+  } catch (err) {
+    res.status(403).send("ERROR:" + err.message);
+  }
+});
+
 app.get("/user", async (req, res) => {
   const userEmail = req.body.firstName;
   try {

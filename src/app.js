@@ -1,13 +1,14 @@
 const express = require("express");
 const connetDB = require("./config/database");
 const bcrypt = require("bcrypt");
-
 const app = express();
-
 const User = require("./models/user");
+const { validateSingupData } = require("./utils/validators");
+const cookieParser = require("cookie-parser");
+const jwt = require("jsonwebtoken");
 
 app.use(express.json());
-const { validateSingupData } = require("./utils/validators");
+app.use(cookieParser());
 
 app.post("/signup", async (req, res) => {
   try {
@@ -16,7 +17,7 @@ app.post("/signup", async (req, res) => {
 
     const { firstName, lastName, emailId, password } = req.body;
     const passwordHash = await bcrypt.hash(password, 10);
-    console.log(passwordHash);
+    // console.log(passwordHash);
 
     // const users = new User(req.body);
     const users = new User({
@@ -38,14 +39,34 @@ app.post("/login", async (req, res) => {
   try {
     const { emailId, password } = req.body;
     const user = await User.findOne({ emailId });
+    const hashedPassword = user.password;
     if (!user) {
       res.status(404).send("user not found");
     }
-    const isPasswordMatch = await bcrypt.compare(password, user.password);
-    if (!isPasswordMatch) {
+    const isPasswordMatch = await bcrypt.compare(password, hashedPassword);
+    if (isPasswordMatch) {
+      const token = jwt.sign({ _id: user._id }, "secret");
+      // console.log(token);
+      res.cookie("token", token);
+      res.send("Loin succesfully");
+    } else {
       res.status(403).send("invalid password");
     }
-    res.send("Loin succesfully");
+  } catch (err) {
+    res.status(403).send("ERROR:" + err.message);
+  }
+});
+
+app.get("/profile", async (req, res) => {
+  const cookies = req.cookies;
+  try {
+    const { token } = cookies;
+    const data = await jwt.verify(token, "secret");
+    const { _id } = data;
+    console.log("Logged in user id", _id);
+
+    const user = await User.findById(_id);
+    res.send(user);
   } catch (err) {
     res.status(403).send("ERROR:" + err.message);
   }

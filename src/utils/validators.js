@@ -8,9 +8,9 @@ const validateSingupData = (req) => {
   if (!validator.isEmail(emailId)) {
     throw new Error("invalid email");
   }
-  if (!validator.isStrongPassword(password)) {
-    throw new Error("password is not strong enough");
-  }
+  // if (!validator.isStrongPassword(password)) {
+  //   throw new Error("password is not strong enough");
+  // }
 };
 
 module.exports = { validateSingupData };
